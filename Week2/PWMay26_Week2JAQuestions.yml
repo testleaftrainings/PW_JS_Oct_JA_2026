@@ -1,0 +1,42 @@
+Week2 : Questions Discussion Arrays Topic :
+-------------------------------------
+
+1, Array map, filter and sort methods?
+Question: How would you sort an array of objects by a specific property in JavaScript?
+
+
+2, Playwright Specific Questions
+-------------------------------- 
+
+1.Why does Playwright not suffer from the "Stale Element Exception" common in Selenium?**
+
+2. A test fails only in CI but passes locally. What is your first step to debug it?**
+
+3.What is the difference between a function login() {} and const login = function() {}? Specifically, how does hoisting affect them in a test script?**
+
+4."Write a reusable JavaScript function that takes a Playwright 'locator' as an input and returns 'true' if the element is both visible and enabled, otherwise returns 'false'.** 
+
+async function locatorReady(locator){
+
+if(true){
+
+return await locator.isVisible()
+}
+
+return false
+}
+
+
+
+Q5. What mechanism does Playwright use to interact with the browser?”
+
+Q6. What is Chrome Dev Protocol?
+
+Q7. what are the Browser Installation commands in PW.
+
+Q8. what are the different browsers supported by Playwright.
+
+Q9. explain about chromium browser.
+
+
+Q10.  What is test function in playwright 
