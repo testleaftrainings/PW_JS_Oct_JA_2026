@@ -1,0 +1,46 @@
+
+Week3JAQuestions:
+-----------------------------
+
+1. Which is the most stable locator strategy and reason ?
+
+2. Stabilizing Locators (Strict Mode Violation)
+
+Problem: page.locator('button') is too generic. If a "Loading Spinner" also uses a <button> tag, Playwright detects two elements and throws a Strict Mode Violation error.
+
+await page.getByRole("button",{name:"View All Applications",exact:true}).click()
+
+3. Relative XPath for Dynamic Tables
+
+4. Modal/Alert Disappearance & Timeouts
+Problem: Default timeout is 5s, but the process takes 6s.
+
+await page.waitForTimeout(5000); // pausing for no reason
+
+expect(page.locator("#alert")).toBeHidden({timeout:6000}) //assertion specific timeout 
+
+await page.locator("#button").click({5000}) //action timeout
+
+
+5. Broken Link Scraper 
+
+
+
+6. Compound XPath (AND Logic)
+Logic: Use the and keyword within square brackets to verify multiple attributes on a single element.
+
+7. How do you handle a dropdown that doesn't use the standard <select> tag but is built with a <div> or <ul> (custom dropdown)?**
+
+
+
+8.Your dropdown options load only after you type 3 characters in an input field. How do you automate this?**
+
+
+9. How do you select multiple options in a standard <select multiple> element?**
+
+await page.selectOption("#ui-selectonemenu",[{label:"Selenium"},{label:"Playwright"}])
+
+10. Static vs. Web-First URL Assertions
+
+
+11. How do you assert colors in the webpage using CSS

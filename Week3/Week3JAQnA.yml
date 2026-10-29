@@ -1,0 +1,229 @@
+
+Week3 JA Question and Answer :
+----------------------------
+
+1. Stabilizing Locators (Strict Mode Violation)
+
+Problem: page.locator('button') is too generic. If a "Loading Spinner" also uses a <button> tag, Playwright detects two elements and throws a Strict Mode Violation error.
+
+Solution:
+
+Use Semantic Locators: Use getByRole with the name option. This filters out buttons that do not have the specific accessible text "Submit".
+
+State Guiding: Ensure the spinner is gone before interacting. Playwright's auto-waiting handles visibility, but if the spinner is a separate button that disappears, checking its state first prevents the collision.
+
+Code Example:
+
+const spinner = page.locator('.loading-spinner');
+await expect(spinner).toBeHidden(); 
+await page.getByRole('button', { name: 'Submit', exact: true }).click();
+
+-----------------------------------------------------------------------------
+
+2. Relative XPath for Dynamic Tables
+
+import { test } from "@playwright/test";
+ 
+test(`Learning Webtable`,async ({page}) => {
+    await page.goto(`https://the-internet.herokuapp.com/tables#edit`);
+    for (let index = 1; index <= 6; index++) {
+    const tableVal =await page.locator(`//table[1]/tbody/tr[1]/td[${index}]`).innerText();
+    console.log(tableVal);        
+    }
+
+})
+-------------------------------------------------------------------------------
+
+3. Modal Disappearance & Timeouts
+Problem: Default timeout is 5s, but the process takes 6s.
+Solution:
+
+Action: Do not increase the global timeout, as this slows down the entire suite's failure reporting.
+
+Local Override: Pass a specific timeout to the web-first assertion.
+ expect(page.locator('#modal')).toBeHidden({timeout:6000});
+Note: This passes immediately once the modal disappears (at 6s), rather than waiting for the full 10s.
+
+-------------------------------------------------------------------------------
+
+4. Broken Link Scraper 
+Option1 :
+
+
+test('scraping link from page',async({page})=>{
+
+
+    await page.goto('https://www.facebook.com/')
+    const address=await page.locator('a').all()
+    
+    for(let i=0;i<address.length;i++)
+    {
+        let link=await address[i].getAttribute('href')
+        if(!link?.startsWith('https')) console.log(link);
+          
+        
+    }
+})
+
+
+-------------------------------
+Option2 :
+---------
+import { test, expect } from '@playwright/test';
+
+test('Check for broken links', async ({ page, request }) => {
+    await page.goto('https://example.com');
+
+    const links = await page.locator('a').evaluateAll(anchors =>
+        anchors
+            .map(anchor => anchor.getAttribute('href'))
+            .filter(href => href && href.trim() !== '')
+    );
+
+    const brokenLinks = [];
+
+    for (const link of links) {
+        const url = new URL(link, page.url()).href;
+
+        try {
+            const response = await request.get(url, {
+                timeout: 10000,
+                maxRedirects: 5
+            });
+
+            if (response.status() >= 400) {
+                brokenLinks.push({
+                    url,
+                    status: response.status()
+                });
+            }
+        } catch (error) {
+            brokenLinks.push({
+                url,
+                status: 'Request failed'
+            });
+        }
+    }
+
+    console.log('Broken links:', brokenLinks);
+
+    expect(brokenLinks).toHaveLength(0);
+});
+------------------------------------------------------------------------------------
+
+5. Compound XPath (AND Logic)
+Logic: Use the and keyword within square brackets to verify multiple attributes on a single element.
+XPath: //input[@class='form-control' and @title='Username']
+
+------------------------------------------------------------------------------------
+
+**6. How do you handle a dropdown that doesn't use the standard <select> tag but is built with a <div> or <ul> (custom dropdown)?**
+
+------------------------------------------------------------------------------------
+
+**7.Your dropdown options load only after you type 3 characters in an input field. How do you automate this?**
+
+await page.locator.pressSquentially("abc") with a a delay to type the characters one by one, or use page.fill("abc") to type the entire string at once.
+
+// Type "abc" into the input field to trigger the dropdown options to load
+
+------------------------------------------------------------------------------------
+
+**8.: How do you select multiple options in a standard <select multiple> element?**
+
+Pass an array of values to the selectOption method, like this: 
+
+
+✔ Option 1: Using values
+
+await page.selectOption('#my-multi-select', ['aws', 'azure']);
+
+✔ Option 2: Using labels
+
+await page.selectOption('#my-multi-select', [
+  { label: 'AWS' },
+  { label: 'Azure' }
+]);
+
+✔ Option 3: Using values + labels mix
+await page.selectOption('#my-multi-select', [
+  { value: 'aws' },
+  { label: 'Azure' }
+]);
+
+In Playwright, to select multiple options in a <select multiple> dropdown, we pass an array of values or option objects (label/value) directly to selectOption().
+
+------------------------------------------------------------------------------------
+
+9. Static vs. Web-First URL Assertions
+test('assertion timeout override',async({page})=>{
+
+    expect(page.locator('#username')).toBeHidden({timeout:6000});
+   
+   
+    const url=page.url()
+    page.click('#login')
+   expect(url).toBe('http://leaftaps.com/crmsfa/control/main') //=>non retry assertion
+   await expect(page).toHaveURL('http://leaftaps.com/crmsfa/control/main',{timeout:6000}) //=>retrying assertion
+
+})
+
+-------------------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------------------------------
+
+COdes :
+
+
+import { test } from "@playwright/test";
+
+test("Google Apps ", async ({ page }) => {
+
+    await page.goto("https://www.google.com/");
+
+    await page.getByRole("button", { name: "Google apps" }).click();
+
+    const frameApp = page.frameLocator('[name="app"]');
+
+      const apps = frameApp.locator('//div[@class="CgwTDb"]//following-sibling::span');
+
+    const appCount = await apps.count()
+
+    console.log(appCount);
+
+    for (let index = 0; index < appCount; index++) {
+
+        await page.waitForLoadState("domcontentloaded")
+        let appName = await apps.nth(index).innerText()
+        console.log(appName);
+
+    }
+
+})
+---------------------------------------------------------------------
+import { test } from "@playwright/test";
+ 
+test(`Learning Webtable`,async ({page}) => {
+    await page.goto(`https://the-internet.herokuapp.com/tables#edit`);
+    for (let index = 1; index <= 6; index++) {
+    const tableVal =await page.locator(`//table[1]/tbody/tr[1]/td[${index}]`).innerText();
+    console.log(tableVal);        
+    }
+
+})
+
+test.only('scraping link from page',async({page})=>{
+
+
+    await page.goto('https://www.facebook.com/')
+    const address=await page.locator('a').all()
+    
+    for(let i=0;i<address.length;i++)
+    {
+        let link=await address[i].getAttribute('href')
+        if(!link?.startsWith('https')) console.log(link);
+          
+        
+    }
+})
